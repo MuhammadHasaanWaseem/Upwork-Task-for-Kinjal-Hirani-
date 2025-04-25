@@ -1,12 +1,14 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { Pressable } from 'react-native';
+import { ArrowLeft } from 'lucide-react-native';
+import { AuthProvider } from '@/provider/AuthProviders';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -29,10 +31,19 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <AuthProvider>
+      <Stack initialRouteName='(auth)' screenOptions={{
+              headerTransparent: true, headerLeft: ({ canGoBack }) => (
+                <Pressable onPress={canGoBack ? () => router.back() : undefined}>
+                  <ArrowLeft color={'white'} />
+                </Pressable>
+              )
+            }}>
+      <Stack.Screen name="(auth)" options={{ headerShown: false,presentation:'modal',animation:'ios_from_left' }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false,presentation:'modal',animation:'ios_from_left' }} />
         <Stack.Screen name="+not-found" />
       </Stack>
+      </AuthProvider>
       <StatusBar style="auto" />
     </ThemeProvider>
   );
